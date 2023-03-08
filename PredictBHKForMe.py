@@ -322,8 +322,8 @@ def predict_catboost(house_type, length, width, floor_area, veranda_area, ground
 
     model_cb = CatBoostRegressor()
 
-    model_path = os.path.join (os.getcwd(), 'models')
-    model_cb.load_model(os.path.join (model_path, 'Model_cb'))
+    working_path = os.getcwd()
+    model_cb.load_model(os.path.join (working_path, 'Model_cb'))
 
     y_pred = model_cb.predict(input_data)
 
