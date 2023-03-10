@@ -2,3 +2,5 @@
 .git/
 parameters/
 PredictBHKForMe.py
+models/
+
