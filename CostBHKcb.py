@@ -14,32 +14,54 @@ from catboost import CatBoostRegressor
 
 
 #calculation of the cost of a basic house kit
-#by CatBoost model
+#and volume of wall kit
+#by CatBoost models
 def predict_catboost(DATA, MODELS_PATH):
 
     #loading a working model
 
-    model_cb = CatBoostRegressor()
-    model_cb.load_model('Model_cb')
+    model_bdk = CatBoostRegressor()
+    model_sk = CatBoostRegressor()
+
+    model_bdk.load_model('Model_cb_bdk')
+    model_sk.load_model('Model_cb_sk')
 
     #calculation of the cost of a house kit
+    #and volume of wall kit
 
-    y_pred = model_cb.predict(DATA)
+    cost_bdk = model_bdk.predict(DATA)
+    volume_sk = model_sk.predict(DATA)
 
-    return y_pred[0]
+    return cost_bdk[0], volume_sk[0]
+
 
 def result(DATA, MODELS_PATH):
 
-    y_pred_out = predict_catboost(DATA, MODELS_PATH)
-    y_pred_out = round(y_pred_out * 1000)
+    cost_bdk_out, volume_sk_out = predict_catboost(DATA, MODELS_PATH)
+
+    cost_bdk_out = round(cost_bdk_out * 1000)
+    volume_sk_out = round(volume_sk_out, 2)
+    cost_sk_out = round(volume_sk_out * 57000)
+    volume_bdk_out = round((cost_bdk_out - cost_sk_out) / 35000 + volume_sk_out)
+
 
     st.write(' ')
-    if y_pred_out % 10 == 1:
-        st.write('Cтоимость базового домокомплекта: ', str(y_pred_out), ' рубль')
-    elif (y_pred_out % 10) in [2, 3, 4]:
-        st.write('Cтоимость базового домокомплекта: ', str(y_pred_out), ' рубля')
+    if cost_bdk_out % 10 == 1:
+        st.write('Предварительная стоимость базового домокомплекта: ', str(cost_bdk_out), ' рубль')
+    elif (cost_bdk_out % 10) in [2, 3, 4]:
+        st.write('Предварительная стоимость базового домокомплекта: ', str(cost_bdk_out), ' рубля')
     else:
-        st.write('Cтоимость базового домокомплекта: ', str(y_pred_out), ' рублей')
+        st.write('Предварительная стоимость базового домокомплекта: ', str(cost_bdk_out), ' рублей')
+    st.write('Вероятный объём базового домокомплекта: ', str(volume_bdk_out), ' м.куб.')
+
+    if cost_sk_out % 10 == 1:
+        st.write('Предварительная стоимость стенокомплекта: ', str(cost_sk_out), ' рубль')
+    elif (cost_sk_out % 10) in [2, 3, 4]:
+        st.write('Предварительная стоимость стенокомплекта: ', str(cost_sk_out), ' рубля')
+    else:
+        st.write('Предварительная стоимость стенокомплекта: ', str(cost_sk_out), ' рублей')
+    st.write('Вероятный объём стенокомплекта: ', str(volume_sk_out), ' м.куб.')
+
 
     return
 
@@ -99,7 +121,7 @@ def input_transform_data():
 
     #drawing the user interface
     house_type = st.radio('Тип строения', ['Дом', 'Баня', 'Беседка'],
-                          help='Для дома считаются черновый полы и потолки, для бани и веранды - чистовые')
+                          help='Для дома считаются черновый полы и потолки, для бани и беседки - чистовые')
     attic_type = st.radio('Тип мансарды', ['Нет мансарды', 'Поднятая', 'Неподнятая'],
                           help='У поднятой мансарды высота боковых стен 1,56 метра')
     double_bar_per = st.number_input('Процент двойного бруса', min_value=0, max_value=100, value=60, step=5,
@@ -145,7 +167,7 @@ def input_transform_data():
     num_of_rooms = st.number_input('Количество помещений', min_value=1, max_value=35, value=6, step=1,
                                    help='все, которые огорожены перегородками, в том числе холлы, коридоры итп')
     roof_type = st.radio('Тип крыши', ['Двускатная', 'Односкатная', 'Вальмовая', 'Сложная'])
-    roof_slope_angle = st.radio('Величина угла крыши', ['Маленький', 'Средний', 'Большой'],
+    roof_slope_angle = st.radio('Величина угла крыши', ['Средний', 'Маленький', 'Большой'],
                                 help='Маленький - меньше 20 градусов, Средний от 20 до 35 градусов, Большой - больше 35 градусов')
     windows_area = st.number_input('Площадь оконных проёмов', min_value=0.0, max_value=90.0, value=14.0, step=0.5,
                                    help='предварительно можно брать 2 м.кв на одно окно, кроме совсем маленьких')
@@ -172,7 +194,7 @@ models_path = working_path
 
 #application header display
 st.markdown('# CЕЙЧАС ВСЁ ПОСЧИТАЕМ!')
-st.markdown('## Расчёт стоимости базового домокомплекта')
+st.markdown('## Предваритеельный расчёт стоимости базового домокомплекта 2.0')
 
 st.markdown('### Введите следующие данные')
 
