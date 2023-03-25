@@ -1,5 +1,11 @@
 .idea/
 .git/
 parameters/
+<<<<<<< HEAD
 models/
 PredictBHKForMe.py
+=======
+PredictBHKForMe.py
+models/
+
+>>>>>>> only-catboost-ver
