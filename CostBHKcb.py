@@ -279,10 +279,12 @@ def information_block_output (house_type, length, width, double_bar_per, attic_t
         house_type = 'Летний домик'
     st.write('')
     text1 = house_type + ' размером ' + str(round(length, 2)) + ' x ' + str(round(width, 2)) + ' м '
-    text2=''
-    if (house_type == 'Баня') and (double_bar_per == 0):
-        text1 += 'из одинарного бруса'
-    if double_bar_per == 100:
+    text2 = ''
+
+    if double_bar_per == 0:
+        if house_type != 'Летний домик':
+            text1 += 'из одинарного бруса'
+    elif double_bar_per == 100:
         text1 += 'полностью из двойного бруса'
     elif double_bar_per == 60:
         text1 += 'cо внешними стенами из двойного бруса'
@@ -300,9 +302,9 @@ def information_block_output (house_type, length, width, double_bar_per, attic_t
         text1 += 'со внешними стенами из двойного бруса'
         text2 = 'и почти всеми внутренними перегородками из двойного бруса'
     elif (double_bar_per > 0) and (double_bar_per < 50):
-        text1 += 'почти все стены и перегородки в нём(ней) из одинарного бруса'
+        text2 += 'почти все стены и перегородки в нём(ней) из одинарного бруса'
     else:
-        text1 += 'со стенами и перегородками большей частью из двойного бруса'
+        text2 += 'со стенами и перегородками большей частью из двойного бруса'
     st.write(text1)
     if text2:
         st.write(text2)
@@ -376,7 +378,7 @@ def input_transform_data():
     elif double_bar_per == 75:
         st.write('Все внешние стены из двойного бруса, перегородки - пополам из двойного и одинарного')
     elif 0 <= double_bar_per <= 45:
-        st.write('Из одинарного бруса с небольшими добавлениями двойного')
+        st.write('Из одинарного бруса с небольшим добавлением двойного')
     elif 50 <= double_bar_per <= 55:
         st.write('Внешние стены из двойного и одинарного бруса, перегородки - из одинарного')
     elif 65 <= double_bar_per <= 70:
@@ -431,7 +433,11 @@ def input_transform_data():
                                    help='все, которые огорожены перегородками, в том числе холлы, коридоры итп')
     roof_type = st.radio('Тип крыши', ['Двускатная', 'Односкатная', 'Вальмовая', 'Сложная'])
 
-    roof_slope_angle = st.radio('Величина угла крыши', ['Средний', 'Маленький', 'Большой'],
+    if attic_type == 'Поднятая':
+        st.write('Для поднятой мансарды угол скатов обычно большой')
+        roof_slope_angle = 'Большой'
+
+    roof_slope_angle = st.radio('Величина угла скатов', ['Средний', 'Маленький', 'Большой'],
                                 help='Маленький - меньше 20 градусов, Средний от 20 до 35 градусов, Большой - больше 35 градусов')
     windows_area = st.number_input('Площадь оконных проёмов в квадратных метрах', min_value=0.0, max_value=90.0, value=14.0, step=0.5,
                                    help='предварительно можно брать 2 м.кв на одно окно, кроме совсем маленьких')
