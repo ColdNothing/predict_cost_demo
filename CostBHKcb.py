@@ -308,11 +308,16 @@ def information_block_output (house_type, length, width, double_bar_per, attic_t
     st.write(text1)
     if text2:
         st.write(text2)
-    if attic_type == 'Нет мансарды':
+    if attic_type == 'Нет мансарды' and house_type == 'Дом':
         st.write('Одноэтажный (без мансарды)')
+    elif attic_type == 'Нет мансарды' and house_type != 'Дом':
+        st.write(' ')
     else:
         st.write('Мансарда', attic_type.lower())
-    st.write('Площадь жилой зоны приблизительно ', str(floor_area), 'м.кв')
+    if attic_type == 'Неподнятая':
+        st.write('Площадь полов дома приблизительно ', str(floor_area), 'м.кв')
+    else:
+        st.write('Площадь жилой зоны приблизительно ', str(floor_area), 'м.кв')
     if veranda_area == 0:
         st.write('Без дополнительных элементов (террасы/веранды/крыльца)')
     else:
@@ -426,31 +431,33 @@ def input_transform_data():
     #default floor_area or not
 
     default_floor_area_mode = st.checkbox('Автоматический расчёт площади полов дома', value=False,
-                                          help='только для простых случаев', label_visibility="visible")
+                                          help='Только для простых случаев', label_visibility="visible")
 
     if default_floor_area_mode:
         floor_area = st.number_input('Площадь полов жилой зоны в квадратных метрах ', min_value=1.0, max_value=500.0, value=floor_area_default,
-                                 step=1.0, help='сейчас рассчитано автоматически')
+                                 step=1.0, help='Сейчас рассчитано автоматически')
     else:
-        floor_area = st.number_input('Площадь полов жилой зоны в квадратных метрах ', min_value=1.0, max_value=500.0, value=1.0,
-                                 step=1.0, help='поставьте галочку для автоматического расчёта')
+        floor_area = st.number_input('Площадь полов (жилой зоны) в квадратных метрах ', min_value=1.0, max_value=500.0, value=1.0,
+                                 step=1.0, help='Поставьте галочку для автоматического расчёта')
 
-    veranda_area = st.number_input('Площадь веранд, террас, крылец, балконов в квадратных метрах ', min_value=0.0, max_value=120.0,
-                                   value=0.0, step=1.0, help='всё, что не из профильного бруса, в сумме')
+    veranda_area = st.number_input('Суммарная площадь веранд, террас, крылец, балконов в квадратных метрах ', min_value=0.0, max_value=200.0,
+                                   value=0.0, step=1.0, help='Всё, что не из профильного бруса, в сумме')
     ground_floor_height = st.number_input('Высота первого этажа в метрах', min_value=1.0, max_value=4.0, value=2.57,
-                                          step=0.1, help='задавать чуть больше. например, 2,57 для 2,5')
+                                          step=0.1, help='Задавать чуть больше. Например, 2,77 для 2,70')
     num_of_rooms = st.number_input('Количество помещений', min_value=1, max_value=35, value=6, step=1,
-                                   help='все, которые огорожены перегородками, в том числе холлы, коридоры итп')
+                                   help='Все, которые огорожены перегородками, в том числе холлы, коридоры итп')
     roof_type = st.radio('Тип крыши', ['Двускатная', 'Односкатная', 'Вальмовая', 'Сложная'])
 
-    if attic_type == 'Поднятая':
-        st.write('Для поднятой мансарды угол скатов обычно большой')
-        roof_slope_angle = 'Большой'
+    if attic_type == 'Неподнятая':
+        st.write('Для неподнятой мансарды угол скатов обычно большой')
+        index = 2
+    else:
+        index = 0
 
-    roof_slope_angle = st.radio('Величина угла скатов', ['Средний', 'Маленький', 'Большой'],
+    roof_slope_angle = st.radio('Величина угла скатов', ['Средний', 'Маленький', 'Большой'], index = index,
                                 help='Маленький - меньше 20 градусов, Средний от 20 до 35 градусов, Большой - больше 35 градусов')
     windows_area = st.number_input('Площадь оконных проёмов в квадратных метрах', min_value=0.0, max_value=90.0, value=14.0, step=0.5,
-                                   help='предварительно можно брать 2 м.кв на одно окно, кроме совсем маленьких')
+                                   help='Предварительно можно брать 2 м.кв на одно окно, кроме совсем маленьких')
 
     #floors and ceilings (draft or finishin)
 
@@ -485,12 +492,7 @@ models_path = working_path
 
 #application header display
 st.markdown('# CЕЙЧАС ВСЁ ПОСЧИТАЕМ!')
-
-st.markdown('## Расчёт стоимости базового домокомплекта')
-
 st.markdown('## Предварительный расчёт стоимости базового домокомплекта 2.0')
-
-
 st.markdown('### Введите следующие данные')
 
 
