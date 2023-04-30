@@ -423,8 +423,18 @@ def input_transform_data():
 
     floor_area_default = round(floor_area_default, 2)
 
-    floor_area = st.number_input('Площадь полов жилой зоны в квадратных метрах ', min_value=1.0, max_value=500.0, value=floor_area_default,
-                                 step=1.0, help='по умолчанию рассчитывается автоматически')
+    #default floor_area or not
+
+    default_floor_area_mode = st.checkbox('Автоматический расчёт площади полов дома', value=False,
+                                          help='только для простых случаев', label_visibility="visible")
+
+    if default_floor_area_mode:
+        floor_area = st.number_input('Площадь полов жилой зоны в квадратных метрах ', min_value=1.0, max_value=500.0, value=floor_area_default,
+                                 step=1.0, help='сейчас рассчитано автоматически')
+    else:
+        floor_area = st.number_input('Площадь полов жилой зоны в квадратных метрах ', min_value=1.0, max_value=500.0, value=1.0,
+                                 step=1.0, help='поставьте галочку для автоматического расчёта')
+
     veranda_area = st.number_input('Площадь веранд, террас, крылец, балконов в квадратных метрах ', min_value=0.0, max_value=120.0,
                                    value=0.0, step=1.0, help='всё, что не из профильного бруса, в сумме')
     ground_floor_height = st.number_input('Высота первого этажа в метрах', min_value=1.0, max_value=4.0, value=2.57,
